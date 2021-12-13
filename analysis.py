@@ -45,7 +45,7 @@ import matplotlib.pyplot as plt
 plt.Figure(figsize=(6, 4))
 plt.scatter(meta_cells['center_x'], meta_cells['center_y'], c='k')
 plt.axis('equal')
-plt.show()
+plt.savefig("tissue.png")
 plt.clf()
 
 # get differentially expressed genes
@@ -54,7 +54,7 @@ de_results = results.query('qval < 0.5')
 de_genes = list(de_results.g)
 
 # visualize differentially expressed genes, plot spatial location and color by expression level
-show = 3
+show = len(de_genes)
 plt.Figure(figsize=(10, 10))
 for i, g in enumerate(de_genes[:show]):
     # plt.subplot(1, 3, i + 1)
@@ -62,7 +62,7 @@ for i, g in enumerate(de_genes[:show]):
     plt.title(g)
     # plt.axis('equal')
     plt.colorbar(ticks=[])
-    plt.show()
+    plt.savefig(f"tissue_{g}.png")
     plt.clf()
 
 # visualize fraction of variance explained by spatial variation
@@ -73,7 +73,8 @@ plt.axhline(0.05, c='black', lw=1, ls='--')
 plt.gca().invert_yaxis()
 plt.xlabel('Fraction spatial variance')
 plt.ylabel('Adj. P-value')
-plt.show()
+plt.savefig("fsv.png")
+plt.clf()
 
 # run automatic expression histology (AEH) requires:
 #       C: number of patterns
@@ -87,14 +88,16 @@ vals = np.array(de_results['l'].value_counts().values)
 l = np.sum(idxs * vals) / np.sum(vals)
 C = 3
 histology_results, patterns = SpatialDE.aeh.spatial_patterns(X, resid_expr, de_results, C=C, l=l, verbosity=1)
+histology_results.to_csv("histology.csv", index=False)
+patterns.to_csv("patterns.csv", index=False)
 
 # visualize expression in the tissue context
-show = 3
 plt.Figure(figsize=(10, 10))
-for i in range(show):
+for i in range(3):
     # plt.subplot(1, 3, i + 1)
     plt.scatter(meta_cells['center_x'], meta_cells['center_y'], c=patterns[i])
     # plt.axis('equal')
     plt.title('Pattern {} - {} genes'.format(i, histology_results.query('pattern == @i').shape[0]))
     plt.colorbar(ticks=[])
-    plt.show()
+    plt.savefig(f"pattern_{i}.png")
+    plt.clf()

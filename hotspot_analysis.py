@@ -23,7 +23,7 @@ num_umi = counts.T.sum(axis=0)
 
 # Create the Hotspot object and the neighborhood graph, calculate spatial variation
 # NOTE: increasing n_neighbors will have affect on FDR
-hs = hotspot.Hotspot(counts.T, model='bernoulli', latent=pos)
+hs = hotspot.Hotspot(counts.T, model='danb', latent=pos)
 hs.create_knn_graph(weighted_graph=False, n_neighbors=200,)
 hs_results = hs.compute_autocorrelations(jobs=1)
 
@@ -49,19 +49,19 @@ results = results.loc[results.Module == module]
 genes = results.sort_values('Z', ascending=False).head(6).index
 
 fig, axs = plt.subplots(2, 3, figsize=(11, 7.5))
-cmap = matplotlib.colors.LinearSegmentedColormap.from_list('grays', ['#DDDDDD', '#000000'])
 for ax, gene in zip(axs.ravel(), genes):
     # NOTE: normalize data here
     expression = np.log2(hs.counts.loc[gene]/hs.umi_counts + 1)
     plt.sca(ax)
-    plt.scatter(x=hs.latent.iloc[:, 0], y=hs.latent.iloc[:, 1], s=2, c=expression,
-                vmin=0, vmax=2, edgecolors='none', cmap=cmap)
+    sc = plt.scatter(x=hs.latent.iloc[:, 0], y=hs.latent.iloc[:, 1], s=2, c=expression,
+                    edgecolors='none', cmap=matplotlib.cm.get_cmap('viridis'))
+    plt.colorbar(sc)
     for sp in ax.spines.values():
         sp.set_visible(False)
     plt.xticks([])
     plt.yticks([])
     plt.title(gene)
-plt.show()
+plt.savefig(f"hotspot_modulescores_{module}.png")
 plt.clf()
 
 # Calculate module scores
@@ -73,8 +73,10 @@ fig, axs = plt.subplots(2, 2, figsize=(11, 7.5))
 for ax, module in zip(axs.ravel(), range(1, hs.modules.max()+1)):
     scores = hs.module_scores[module]
     plt.sca(ax)
-    plt.scatter(x=hs.latent.iloc[:, 0], y=hs.latent.iloc[:, 1], s=2, c=scores,
-                vmin=np.percentile(scores, 1), vmax=np.percentile(scores, 99), edgecolors='none')
+    sc = plt.scatter(x=hs.latent.iloc[:, 0], y=hs.latent.iloc[:, 1], s=2, c=scores,
+                    vmin=np.percentile(scores, 1), vmax=np.percentile(scores, 99),
+                    edgecolors='none')
+    plt.colorbar(sc)
     for sp in ax.spines.values():
         sp.set_visible(False)
     plt.xticks([])

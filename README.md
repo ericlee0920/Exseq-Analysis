@@ -1,12 +1,12 @@
-# SpatialDE_app
-Identify spatially variable genes based on the input data of spatial cells positions, and cells genes expression for Merfish, exseq, smFish.
+# Exseq Analysis
+Identify spatially variable genes based on the input data of spatial cells positions, and cells genes expression for exseq.
 
 ### Analysis Pipeline and Results
 - `spatialDE_analysis.py` : results are in `220116_SpatialDE_results.zip`
-- `hotspot_analysis.py` : results are in `220116_Hotspot_results.zip`
+- `hotspot_analysis.py` : results are in `220123_Hotspot_results.zip`
 
 
-### How to run this:
+### How to run SpatialDE:
 1. Prepare inputs: 
     - "gene by cell" count matrix,
     -  metadata with spatial coordinate columns named as "center_x" and "center_y" in the same cell order.
